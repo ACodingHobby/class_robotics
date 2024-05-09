@@ -1,7 +1,7 @@
 #pragma config(Sensor, in1,    line1,          sensorLineFollower)
 #pragma config(Sensor, in2,    line2,          sensorLineFollower)
 #pragma config(Sensor, dgtl1,  limit,          sensorTouch)
-#pragma config(Sensor, dgtl2,  bump,           sensorNone)
+#pragma config(Sensor, dgtl2,  bump,           sensorTouch)
 #pragma config(Motor,  port2,           motor1,        tmotorServoContinuousRotation, openLoop)
 #pragma config(Motor,  port3,           motor2,        tmotorServoContinuousRotation, openLoop)
 #pragma config(Motor,  port4,           motor3,        tmotorServoStandard, openLoop)
@@ -15,17 +15,33 @@ task main()
 
 //line1 is start
 //line2 is stop
-
+waitUntil(SensorValue[bump] == 1);
 while(true) { // makes program go forever
-	waitUntil(SensorValue[line1] < 1900); // wait until line is covered
-	motor[motor3] = -15; // turn motor on
-	waitUntil(SensorValue[line2] < 1900); // wait until line2 is covered
-	motor[motor3] = 0; // turn the mtor for conveyor off
-	motor[motor1] = 25; // turn the motor for the cutting on
-	wait1Msec(2000); // turn for 2 seconds
-	motor[motor2] = 15; // turn motor for chain drive on
-	waitUntil(SensorValue[limit] == 1); // wait until the limit is pressed with cutting shaft
-	motor[motor1] = 0; // motor for cutting off
-	motor[motor3] = -15; // conveyor motor on again
+	if(SensorValue[line1] < 1900) // wait until line is covered
+	{
+		motor[motor3] = -15; // turn motor on
+	}
+	
+	if(SensorValue[line2] < 1900) // wait until line2 is covered
+	{
+		motor[motor3] = 0; // turn the motor for conveyor off
+		motor[motor1] = 25; // turn the motor for the cutting on
+		wait1Msec(2000); // turn for 2 seconds
+		motor[motor2] = 15; // turn motor for chain drive on
+	}
+		if(SensorValue[limit]==1){
+// wait until the limit is pressed with cutting shaft
+	
+		motor[motor1] = 0; // motor for cutting off
+		motor[motor3] = -15; // conveyor motor on again
+		motor[motor2]=0;
+
+}
+	while(SensorValue[bump]==1)
+	{
+		motor[motor3] = 0;
+		motor[motor2] = 0;
+		motor[motor1] = 0;
+	}
 }
 }
