@@ -10,32 +10,50 @@
 task main()
 {
 // motor1 is motor for cutting
-// motor2 is motor for chaind drive
+// motor2 is motor for chain drive
 // motor3 is motor for conveyor
 
-//line1 is start
-//line2 is stop
+// line1 is start
+// line2 is stop
 
 while(true) { // makes program go forever
-//	waitUntil(SensorValue[line1] < 1900); 
 
-	motor[motor3] = 19; // turn motor on
+    // Check if the bump switch is pressed
+    if(SensorValue[bump] == 1) {
+        // If the bump switch is pressed, stop all motors
+        motor[motor1] = 0;
+        motor[motor2] = 0;
+        motor[motor3] = 0;
+        // Wait until the bump switch is released
+        while(SensorValue[bump] == 1) {
+            wait1Msec(10); // Small delay to prevent busy waiting
+        }
+    }
 
-	
-	waitUntil(SensorValue[line2] < 1900); // wait until line2 is covered
+    motor[motor3] = 19; // turn motor on
 
-	motor[motor3] = 0; // turn the mtor for conveyor off
-	motor[motor1] = 25; // turn the motor for the cutting on
+    waitUntil(SensorValue[line2] < 1900); // wait until line2 is covered
 
-	
-	wait1Msec(2000); // turn for 2 seconds
-	motor[motor2] = 15; // turn motor for chain drive on
-	waitUntil(SensorValue[limit] == 1); // wait until the limit is pressed with cutting shaft
+    motor[motor3] = 0; // turn the motor for conveyor off
+    motor[motor1] = 25; // turn the motor for cutting on
 
-	motor[motor1] = 0; // motor for cutting off
-	motor[motor3] = 19; // conveyor motor on again
-	wait1Msec(4000);
-	motor[motor3] = 0;
-	
+    wait1Msec(2000); // turn for 2 seconds
+    motor[motor2] = 15; // turn motor for chain drive on
+    waitUntil(SensorValue[limit] == 1); // wait until the limit is pressed with cutting shaft
+
+    motor[motor1] = 0; // motor for cutting off
+    motor[motor3] = 19; // conveyor motor on again
+    wait1Msec(4000);
+    motor[motor3] = 0;
+
+    // After each step, check if the bump switch is pressed and handle it accordingly
+    if(SensorValue[bump] == 1) {
+        motor[motor1] = 0;
+        motor[motor2] = 0;
+        motor[motor3] = 0;
+        while(SensorValue[bump] == 1) {
+            wait1Msec(10);
+        }
+    }
 }
 }
